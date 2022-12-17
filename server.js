@@ -1,18 +1,19 @@
 // express server initialization
 const express = require('express')
 const app = express()
-const bcrypt = require('bcryptjs')
 
 // env vars and body parser
 app.use(express.json())
 require('dotenv').config()
 
 // third-party packages
+const jwt = require('jsonwebtoken')
 const colors = require('colors')
 
 // driver session
 const { initDriver, getDriver } = require('./neo4j')
 const { errorHandler, notFound } = require('./middlewares/errorHandler')
+const { encryptPassword } = require('./utils/Hash')
 const driver = getDriver()
 const session = driver.session({database: 'neo4j'})
 
@@ -22,15 +23,15 @@ const session = driver.session({database: 'neo4j'})
 app.use('/api/v1/auth/register', async(req, res) => {
     let {username, email, password} = req.body
 
-    const salt = await bcrypt.genSalt(10)
-    password = await bcrypt.hash(password, salt)
+    password = await encryptPassword(password)
 
-    const newUser = await session.executeWrite(tx => {
+    const userNode = await session.executeWrite(tx => {
         return tx.run(
           `
             MERGE (u: User {email: $email})
             SET u.username = $username
             SET u.password = $password
+            RETURN properties(u)
           `, {
             username,
             email,
@@ -39,8 +40,8 @@ app.use('/api/v1/auth/register', async(req, res) => {
         )
     })
 
-    if (newUser) {
-        res.status(200).json({ username, email })
+    if (userNode.records.length > 0) {
+        res.status(200).json({ ...userNode.records[0]._fields[0], token: jwt.sign({userEmail: email}, process.env.JWT_SECRET, {expiresIn: '30d'}) })
     } else {
         res.status(400)
         throw new Error('User was not created')
@@ -51,15 +52,14 @@ app.use('/api/v1/auth/register', async(req, res) => {
 app.use('/api/v1/auth/login', async(req, res) => {
     let {email, password} = req.body
 
-    const salt = await bcrypt.genSalt(10)
-    password = await bcrypt.hash(password, salt)
+    password = await encryptPassword(password)
 
     const userNode = await session.executeRead(tx => {
         return tx.run(
           `
           MATCH (u: User)
             WHERE u.email = $email
-            RETURN u.password
+            RETURN properties(u)
           `, {
             email,
           }
@@ -67,7 +67,7 @@ app.use('/api/v1/auth/login', async(req, res) => {
     })
 
     if (userNode.records.length > 0) {
-        res.status(200).json({ email })
+        res.status(200).json({ ...userNode.records[0]._fields[0], token: jwt.sign({userEmail: email}, process.env.JWT_SECRET, {expiresIn: '30d'}) })
     } else {
         res.status(401)
         throw new Error('Wrong user credentials')

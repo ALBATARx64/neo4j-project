@@ -1,6 +1,7 @@
 // express server initialization
 const express = require('express')
 const app = express()
+const bcrypt = require('bcryptjs')
 
 // env vars and body parser
 app.use(express.json())
@@ -19,11 +20,18 @@ const session = driver.session({database: 'neo4j'})
 
 // Create User
 app.use('/api/v1/auth/register', async(req, res) => {
-    const {username, email, password} = req.body
+    let {username, email, password} = req.body
+
+    const salt = await bcrypt.genSalt(10)
+    password = await bcrypt.hash(password, salt)
 
     const newUser = await session.executeWrite(tx => {
         return tx.run(
-          ``, {
+          `
+            MERGE (u: User {email: $email})
+            SET u.username = $username
+            SET u.password = $password
+          `, {
             username,
             email,
             password,
@@ -39,15 +47,21 @@ app.use('/api/v1/auth/register', async(req, res) => {
     }
 })
 
-// Authenticate User
+// Log In
 app.use('/api/v1/auth/login', async(req, res) => {
-    const {email, password} = req.body
+    let {email, password} = req.body
+
+    const salt = await bcrypt.genSalt(10)
+    password = await bcrypt.hash(password, salt)
 
     const userNode = await session.executeRead(tx => {
         return tx.run(
-          ``, {
+          `
+          MATCH (u: User)
+            WHERE u.email = $email
+            RETURN u.password
+          `, {
             email,
-            password,
           }
         )
     })

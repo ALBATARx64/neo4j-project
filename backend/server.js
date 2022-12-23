@@ -53,6 +53,7 @@ app.use('/api/v1/auth/login', async(req, res) => {
     let {email, password} = req.body
 
     password = await encryptPassword(password)
+    
 
     const userNode = await session.executeRead(tx => {
         return tx.run(
@@ -88,8 +89,6 @@ const start = async() => {
     app.listen(PORT, () => {
         console.log(colors.yellow.underline.bold(`Server listening in ${process.env.NEO4J_ENV} mode on port ${PORT}...`))
     })
-
-    return driver
 } catch (error) {
     console.log(colors.underline.bold.red(`Error: ${error}`))
    }

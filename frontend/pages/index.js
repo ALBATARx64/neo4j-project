@@ -96,11 +96,11 @@ export default function Home() {
               }
             <div className="form-control">
                 <label htmlFor="">email</label>
-                <input type="email" pattern="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$" placeholder='john_doe@example.com' onChange={(e) => setEmail(e.target.value)} ref={emailRef} />
+                <input type="email" pattern="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$" placeholder={isLogin ? '' : 'john_doe@example.com'} onChange={(e) => setEmail(e.target.value)} ref={emailRef} />
               </div>
               <div className="form-control">
                 <label htmlFor="">password</label>
-                <input type="password" placeholder='at least one lowercase, uppercase, digit and special char' onChange={(e) => setPassword(e.target.value)} ref={passwordRef} />
+                <input type="password" placeholder={isLogin ? '' : 'at least one lowercase, uppercase, digit and special char'} onChange={(e) => setPassword(e.target.value)} ref={passwordRef} />
               </div>
               {!isLogin && (
                 <div className="form-control">

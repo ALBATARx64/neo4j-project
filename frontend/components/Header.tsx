@@ -2,7 +2,6 @@ import React from 'react'
 import Link from 'next/link'
 import { GiHummingbird } from 'react-icons/gi'
 import { BsChevronDown } from 'react-icons/bs'
-import { BiMessageSquareDetail } from 'react-icons/bi'
 
 const Header = () => {
   return (
@@ -14,9 +13,6 @@ const Header = () => {
             </Link>
 
             <ul>
-                <li>
-                    <BiMessageSquareDetail className='list-item-icon' />
-                </li>
                 <li className='user'>
                     <a href="#">
                         John Doe
@@ -27,8 +23,16 @@ const Header = () => {
 
                     <div className="dropdown-list">
                         <ul>
-                            <li>Profile</li>
-                            <li>Settings</li>
+                            <li>
+                                <Link href='/profile'>
+                                    Profile
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href='/profile/settings'>
+                                    Settings
+                                </Link>
+                            </li>
                             <li>Log Out</li>
                         </ul>
                     </div>

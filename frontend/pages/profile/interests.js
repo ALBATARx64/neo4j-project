@@ -65,10 +65,6 @@ const interestsArr = [
         image: 'https://media.sudouest.fr/11097238/1000x500/15715412.jpg?v=1653728200'
     },
     {
-        title: 'Rocket Science',
-        image: 'https://media.sudouest.fr/11097238/1000x500/15715412.jpg?v=1653728200'
-    },
-    {
         title: 'Gaming & Consoles',
         image: 'https://cdn.mos.cms.futurecdn.net/rJ6wgSVrEVGzE7Zr5RfSBg.jpg'
     },

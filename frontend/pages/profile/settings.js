@@ -29,6 +29,19 @@ const settings = () => {
 
             <article>
               <div className='main-info'>
+                <h5>Your Bio</h5>
+                <p>This is your biographt on Grapher</p>
+                <input type="text" placeholder='Describe yourself or your goals' value='' />
+              </div>
+
+              <div className="info">
+                <p>Please use 40 characters at maximum</p>
+                <button>Save</button>
+              </div>
+            </article>
+
+            <article>
+              <div className='main-info'>
                 <h5>Your Email</h5>
                 <p>Please enter the email address you want to use to log in with Grapher</p>
                 <input type="email" placeholder='john_doe@example.com' value='john_doe@gmail.com' />

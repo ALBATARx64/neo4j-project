@@ -866,6 +866,13 @@ nav {
                 margin-top: 0.8rem;
             }
 
+            .btn-container {
+                button {
+                    width: fit-content;
+                    padding: 0.4rem 1.7rem;
+                }
+            }
+
             h2 {
                 font-size: 1.7rem;
                 text-transform: capitalize;

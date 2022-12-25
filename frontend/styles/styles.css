@@ -1601,6 +1601,12 @@ nav header ul li .icon {
   color: #787878;
   margin-top: 0.8rem;
 }
+.profile .container .user-info .btn-container button {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  padding: 0.4rem 1.7rem;
+}
 .profile .container .user-info h2 {
   font-size: 1.7rem;
   text-transform: capitalize;

@@ -37,6 +37,11 @@ const index = () => {
                     <BsCalendar3 />
                     Joined June 2020
                 </div>
+
+                {/* this button should appear conditionally */}
+                <div className="btn-container">
+                    <button>Follow</button>
+                </div>
             </div>
 
             <div className="posts">

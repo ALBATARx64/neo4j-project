@@ -149,14 +149,15 @@ router.post("/:id", protect, async (req, res) => {
   let L = likes.records[0]._fields[0];
   let numbL = post.records[0]._fields[0].likes;
   let k;
+  console.log("Likes " + L.users);
   if (L.users.includes(res.user.email)) {
     console.log("True");
     let e = res.user.email;
     k = L.users;
-    k = k.replace(`,${res.user.email}`, "");
+    k = k.replace(`${res.user.email},`, "");
     numbL = parseInt(numbL) - 1;
   } else {
-    k = L.users.concat(`,${res.user.email}`);
+    k = L.users.concat(`${res.user.email},`);
     numbL = parseInt(numbL) + 1;
     console.log(k);
   }
@@ -170,26 +171,6 @@ router.post("/:id", protect, async (req, res) => {
       data: result.records[0]._fields,
     });
   }
-
-  // let userPost = await neo4jCalls.getPost(id);
-  // L = userPost.records[0]._fields[0].likes;
-  // console.log("L  " + L);
-  // if (L != 0) {
-  //   likes = L;
-  //   likes[0].push({ userEmail: res.user.email });
-  //   likes[1] = parseInt(likes[1]) + 1;
-  // } else {
-  //   likes.push([{ userEmail:`${res.user.email}` }]);
-  //   likes.push(1);
-  // }
-  // console.log("Likes " + likes);
-  // const result = await neo4jCalls.likePost(id, likes);
-  // if (result) {
-  //   res.json({
-  //     success: 1,
-  //     message: "Liked Post succussefuly",
-  //   });
-  // }
 });
 
 module.exports = router;

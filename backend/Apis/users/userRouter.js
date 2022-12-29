@@ -25,6 +25,7 @@ router.post("/register", async (req, res) => {
               MERGE (u: User {email: $email})
               SET u.username = $username
               SET u.password = $password
+              SET u.likedPosts = ','
               RETURN properties(u)
             `,
       {
@@ -87,6 +88,30 @@ router.get("/users", protect, (req, res) => {
     success: 1,
     messgae: "we did it",
     token: req.headers.authorization,
+  });
+});
+
+router.post("/intersts", protect, async (req, res) => {
+  console.log("Select your interests");
+  let listIntersets = req.body.intersets;
+  let email = res.user.email;
+  console.log("List01 " + listIntersets);
+  const userNode = await session.executeWrite((tx) => {
+    return tx.run(
+      `
+            MATCH (u: User {email: "${email}"})
+              set u.intersts = "${listIntersets}"
+            `,
+      {
+        email,
+        listIntersets,
+      }
+    );
+  });
+
+  res.json({
+    success: 1,
+    messgae: "Working very well",
   });
 });
 

@@ -7,10 +7,10 @@ let session = driver.session();
 // Run a Cypher statement, reading the result in a streaming manner as records arrive:
 
 exports.getAllPosts = async function () {
-  const postNode = await session.executeRead((tx) => {
+  const postNode = await session.executeWrite((tx) => {
     return tx.run(
       `
-      match (n:POST) return properties(n)
+      match (n:POST) set n.id = id(n) return properties(n)
           `,
       {}
     );
@@ -21,16 +21,18 @@ exports.getAllPosts = async function () {
 
 exports.createPost = async function (email, subject, text) {
   let likes = ",";
+  let date = new Date();
   const postNode = await session.executeWrite((tx) => {
     return tx.run(
       `
       MATCH (u:User {email :'${email}' })
-create (u) -[:HAS_POST] ->(p:POST {subject:'${subject}', text:"${text}", emailUser:"${email}", likes: 0 }) -[:HAS_LIKES] ->(l:LIKES {users:"${likes}" })
+create (u) -[:HAS_POST] ->(p:POST {subject:'${subject}', text:"${text}", emailUser:"${email}", likes: 0 , date:"${date}"}) -[:HAS_LIKES] ->(l:LIKES {users:"${likes}" })
             `,
       {
         email,
         subject,
         text,
+        date,
       }
     );
   });
@@ -73,11 +75,26 @@ exports.updatePost = async function (id, subject, post) {
 
 exports.likePost = async function (id, numbL, L) {
   let query = `match (n:POST) - [con:HAS_LIKES] -> (l:LIKES) where id(n) = ${id} set n.likes = ${numbL} set l.users = '${L}' return properties(l)`;
-
   const postNode = await session.executeWrite((tx) => {
     return tx.run(query, {});
   });
 
+  return postNode;
+};
+
+exports.getUserLikes = async function (email) {
+  let query = `match (n:User {email:"${email}"}) return n.likedPosts as likedPosts`;
+  const userLikesNode = await session.executeRead((tx) => {
+    return tx.run(query, {});
+  });
+  return userLikesNode;
+};
+
+exports.updateUserLikes = async function (id, email, likes) {
+  let query = `match (n:User {email:"${email}"}) set n.likedPosts = "${likes}"`;
+  const postNode = await session.executeWrite((tx) => {
+    return tx.run(query, {});
+  });
   return postNode;
 };
 
@@ -92,4 +109,32 @@ exports.getLikesOfPost = async function (id) {
   });
 
   return likesNode;
+};
+
+exports.getSuggestionsPosts1 = async function (email) {
+  let query1 = `match (n:User {email: "${email}"})-[:HAS_POST]->(p:POST) return DISTINCT p.subject as subject`;
+  const SuggestedNode = await session.executeWrite((tx) => {
+    return tx.run(query1, {});
+  });
+  return SuggestedNode;
+};
+
+exports.getSuggestionsPosts2 = async function (subject, email) {
+  let query2 = `match (n:POST)-[:HAS_LIKES]->(l:LIKES)
+  where n.subject CONTAINS "${subject}" and n.emailUser <> "${email}" and not l.users CONTAINS "${email}" set n.id = id(n) 
+  return properties(n)`;
+  const SuggestedNode = await session.executeWrite((tx) => {
+    return tx.run(query2, {});
+  });
+  return SuggestedNode;
+};
+
+exports.getUserIntersts = async function (email) {
+  let query1 = `match(n:User {email: "${email}"}) return n.intersts as intersts`;
+
+  const interstsNode = await session.executeRead((tx) => {
+    return tx.run(query1, {});
+  });
+
+  return interstsNode;
 };

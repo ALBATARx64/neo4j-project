@@ -37,7 +37,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
       );
     });
 
-    res.user = userNode.records[0]._fields[0];
+    req.user = userNode.records[0]._fields[0];
 
 
     next();

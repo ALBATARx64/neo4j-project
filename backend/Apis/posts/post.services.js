@@ -19,18 +19,18 @@ exports.getAllPosts = async function () {
   return postNode;
 };
 
-exports.createPost = async function (email, subject, text) {
-  let likes = ",";
-  let date = new Date();
+exports.createPost = async function (text) {
+  const likes = ",";
+  const date = new Date().toLocaleDateString().split(0, 15);
+
   const postNode = await session.executeWrite((tx) => {
     return tx.run(
       `
-      MATCH (u:User {email :'${email}' })
-create (u) -[:HAS_POST] ->(p:POST {subject:'${subject}', text:"${text}", emailUser:"${email}", likes: 0 , date:"${date}"}) -[:HAS_LIKES] ->(l:LIKES {users:"${likes}" })
+      MATCH (u:User {email :'${req.user.email}' })
+create (u) -[:HAS_POST] ->(p:POST {text:"${text}", emailUser:"${req.user.email}", likes: 0 , date:"${date}"}) -[:HAS_LIKES] ->(l:LIKES {users:"${likes}" })
             `,
       {
         email,
-        subject,
         text,
         date,
       }
@@ -44,11 +44,8 @@ exports.deletePost = async function (id) {
   where id(p) = ${id} 
   detach delete p, l`;
 
-  let string = await session.run(query, {}).catch((err) => {
-    console.log(err);
-  });
+  let string = await session.run(query, {});
 
-  console.log("String ", string);
   return string;
 };
 

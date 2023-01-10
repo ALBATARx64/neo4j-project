@@ -36,7 +36,7 @@ const index = () => {
               <h4>Yakoub Hoduini</h4>
             </header>
 
-            <textarea placeholder='What is on yout mind Yakoub?'></textarea>
+            <textarea placeholder='What is on your mind Yakoub?'></textarea>
           
             <div className="btn-container">
               <button>

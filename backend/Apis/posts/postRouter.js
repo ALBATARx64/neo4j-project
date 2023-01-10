@@ -5,9 +5,10 @@ const { protect } = require("../../middlewares/authMiddleware");
 let string;
 
 router.post("/createPost", protect, async (req, res) => {
-  let { subject, text } = req.body;
-  let email = res.user.email;
-  if (!subject || !text) {
+  let { text } = req.body;
+  let email = req.user.email;
+
+  if (!text) {
     console.log(`Field must not be empety`);
     res.json({
       success: 0,
@@ -15,7 +16,7 @@ router.post("/createPost", protect, async (req, res) => {
     });
   } else {
     try {
-      string = await neo4jCalls.createPost(email, subject, text);
+      string = await neo4jCalls.createPost(email, text);
       if (string) {
         res.json({
           success: 1,
@@ -50,7 +51,7 @@ router.delete("/deletePost/:id", protect, async (req, res) => {
     });
   } else {
     userEmail = userEmail.records[0]._fields[0].emailUser;
-    if (userEmail !== res.user.email) {
+    if (userEmail !== req.user.email) {
       res.json({
         success: 0,
         message: "You can not delete this post it is not yours ",
@@ -115,7 +116,7 @@ router.put("/updatePost/:id", protect, async (req, res) => {
     });
   } else {
     userEmail = userPost.records[0]._fields[0].emailUser;
-    if (userEmail !== res.user.email) {
+    if (userEmail !== req.user.email) {
       res.json({
         success: 0,
         message: "You can not update this post it is not yours ",
@@ -144,7 +145,7 @@ router.put("/updatePost/:id", protect, async (req, res) => {
 
 router.post("/:id", protect, async (req, res) => {
   let id = req.params.id;
-  let email = res.user.email;
+  let email = req.user.email;
   let likes = await neo4jCalls.getLikesOfPost(id);
   let post = await neo4jCalls.getPost(id);
   if (likes.records[0] == undefined) {
@@ -157,17 +158,17 @@ router.post("/:id", protect, async (req, res) => {
     let numbL = post.records[0]._fields[0].likes;
     let k;
     console.log("Likes " + L.users);
-    if (L.users.includes(res.user.email)) {
+    if (L.users.includes(req.user.email)) {
       let e = email;
       k = L.users;
-      k = k.replace(`${res.user.email},`, "");
+      k = k.replace(`${req.user.email},`, "");
       numbL = parseInt(numbL) - 1;
       let likedPosts = await neo4jCalls.getUserLikes(email);
       let lPosts = likedPosts.records[0]._fields[0];
       lPosts = lPosts.replace(`${id},`, "");
       let u = await neo4jCalls.updateUserLikes(id, email, lPosts);
     } else {
-      k = L.users.concat(`${res.user.email},`);
+      k = L.users.concat(`${req.user.email},`);
       numbL = parseInt(numbL) + 1;
       let likedPosts = await neo4jCalls.getUserLikes(email);
       let lPosts = likedPosts.records[0]._fields[0];
@@ -188,7 +189,7 @@ router.post("/:id", protect, async (req, res) => {
 });
 
 router.get("/", protect, async (req, res) => {
-  let email = res.user.email;
+  let email = req.user.email;
   let result = await neo4jCalls.getSuggestionsPosts1(email);
   let tempSubjects = result.records;
   let Subjects = [];
